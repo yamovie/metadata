@@ -3,7 +3,7 @@ const morgan = require('morgan');
 const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
-// const routes = require('../routes');
+const routes = require('../routes');
 
 /**
  * Express instance
@@ -28,6 +28,6 @@ app.use(helmet());
 app.use(cors());
 
 // Mount api routes
-// app.use('/', routes);
+app.use('/', routes);
 
 module.exports = app;

@@ -1,9 +1,11 @@
-const express = require('express');
+const { port, env } = require('./config/vars');
+const app = require('./config/express');
+const mongoose = require('./config/mongoose');
 
-const app = express();
+// Open Mongoose connection
+mongoose.connect();
 
-const PORT = 5000;
+// Listen to requests
+app.listen(port, () => console.info(`Server started on port ${port} - ${env}`));
 
-app.use(express.json());
-
-app.listen(PORT, () => console.log(`Metadata service running on PORT ${PORT}`));
+module.exports = app;
