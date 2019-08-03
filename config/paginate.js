@@ -1,7 +1,8 @@
 const mongoosePaginate = require('mongoose-paginate-v2');
+const { pageSize } = require('./vars');
 
 mongoosePaginate.paginate.options = {
-  limit: 20,
+  limit: pageSize,
   populate: 'genres offers.buy.provider offers.rent.provider offers.stream.provider',
   lean: true,
   leadWithId: true,

@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { env, mongo } = require('./vars');
+const { ENV, MONGO } = require('./vars');
 
 // Set mongoose Promise to native Promise
 mongoose.Promise = Promise;
@@ -9,19 +9,19 @@ mongoose.connection.on('connected', () => {
 });
 
 // Exit app on error
-mongoose.connection.on('error', err => {
+mongoose.connection.on('error', (err) => {
   console.error(err);
   process.exit(-1);
 });
 
 // Print Mongoose logs in dev environment
-if (env === 'development') mongoose.set('debug', true);
+if (ENV === 'development') mongoose.set('debug', true);
 
 const connect = () => {
-  mongoose.connect(mongo.uri, {
+  mongoose.connect(MONGO.URI, {
     keepAlive: true,
-    useNewUrlParser: true
-  })
+    useNewUrlParser: true,
+  });
   return mongoose.connection;
 };
 

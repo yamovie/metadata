@@ -1,9 +1,10 @@
 require('dotenv').config();
 
 module.exports = {
-  env: process.env.NODE_ENV,
-  port: process.env.PORT,
-  mongo: {
-    uri: process.env.DB_URI
-  }
-}
+  ENV: process.env.NODE_ENV,
+  PORT: process.env.PORT,
+  MONGO: {
+    URI: process.env.DB_URI,
+  },
+  PAGE_SIZE: 20,
+};
