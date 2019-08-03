@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/yamovie/metadata/issues"
   },
-  "homepage": "https://github.com/yamovie/metadata#readme"
+  "homepage": "https://github.com/yamovie/metadata#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
