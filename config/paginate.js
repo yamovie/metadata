@@ -18,4 +18,4 @@ mongoosePaginate.paginate.options = {
   },
 };
 
-module.exports = { paginate: mongoosePaginate };
+module.exports = mongoosePaginate;

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const paginate = require('../config/paginate');
 
-const movieSchema = new mongoose.Schema(
+const MovieSchema = new mongoose.Schema(
   {
     jw_url: {
       type: String,
@@ -20,7 +20,7 @@ const movieSchema = new mongoose.Schema(
     genres: [
       {
         type: [mongoose.Schema.Types.ObjectId],
-        ref: 'JW_Genre',
+        ref: 'Genre',
       },
     ],
     credits: Object,
@@ -69,8 +69,16 @@ const movieSchema = new mongoose.Schema(
   { collection: 'movies' },
 );
 
-movieSchema.plugin(paginate);
-movieSchema.index({ title: 'text', 'credits.crew.name': 'text', 'credits.cast.name': 'text' });
+function moviePopulate(next) {
+  this.populate('genres offers.buy.provider offers.rent.provider offers.stream.provider');
+  next();
+}
 
-const Movie = mongoose.model('Movie', movieSchema);
+MovieSchema.pre('find', moviePopulate);
+MovieSchema.pre('findOne', moviePopulate);
+
+MovieSchema.plugin(paginate);
+MovieSchema.index({ title: 'text', 'credits.crew.name': 'text', 'credits.cast.name': 'text' });
+
+const Movie = mongoose.model('Movie', MovieSchema);
 module.exports = Movie;

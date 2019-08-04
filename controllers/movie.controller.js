@@ -1,131 +1,88 @@
-const Movie = require('../models/movie.model');
-const { pageSize } = require('../config/vars');
+const JSONStream = require('JSONStream');
+const { Movie } = require('../models');
+const { PAGE_SIZE } = require('../config/vars');
 
-const readBySearchAll = async (req, res) => {
-  const regex = new RegExp(req.query.searchInput, 'gi');
-  const conditions = Movie.find({
-    $or: [
-      { title: regex },
-      { 'credits.cast.name': regex },
-      { 'credits.crew.name': regex },
-    ],
-  });
-
-  const options = { page: req.query.page || 1 };
-
-  const foundMovie = await Movie.paginate(conditions, options);
-  return res.json(foundMovie);
+const readAll = (req, res) => {
+  const skip = req.query.offset || 0;
+  const limit = req.query.limit || PAGE_SIZE;
+  Movie.find({}, null, { skip, limit })
+    .cursor()
+    .pipe(JSONStream.stringify())
+    .pipe(res.type('json'));
 };
 
-const readBySearchTitle = async (req, res) => {
-  const regex = new RegExp(req.query.searchInput, 'gi');
-  const conditions = Movie.find({ title: regex });
-
-  const options = { page: req.query.page || 1 };
-
-  const foundMovie = await Movie.paginate(conditions, options);
-  return res.json(foundMovie);
+const readOne = (req, res) => {
+  Movie.findOne({ _id: req.params.id })
+    .then(doc => res.json(doc))
+    .catch(err => console.error(err));
 };
 
-const readBySearchCast = async (req, res) => {
-  const regex = new RegExp(req.query.searchInput, 'gi');
-  const conditions = Movie.find({ 'credits.cast.name': regex });
-
-  const options = { page: req.query.page || 1 };
-
-  const foundMovie = await Movie.paginate(conditions, options);
-  return res.json(foundMovie);
+const readByGenre = (req, res) => {
+  const skip = req.query.offset || 0;
+  const limit = req.query.limit || PAGE_SIZE;
+  Movie.find({ genres: req.params.id }, null, { skip, limit })
+    .cursor()
+    .pipe(JSONStream.stringify())
+    .pipe(res.type('json'));
 };
 
-const readBySearchCrew = async (req, res) => {
-  const regex = new RegExp(req.query.searchInput, 'gi');
-  const conditions = Movie.find({ 'credits.crew.name': regex });
-
-  const options = { page: req.query.page || 1 };
-
-  const foundMovie = await Movie.paginate(conditions, options);
-  return res.json(foundMovie);
-};
-
-/**
- * Serves JSON object of all genres.
- * @param {Object} req HTTP request
- * @param {Object} res HTTP response
- */
-const readAll = async (req, res) => {
-  const allMovies = await Movie.paginate(
-    {},
-    {
-      page: req.query.page || 1,
-    },
-  );
-  return res.json(allMovies);
-};
-
-/**
- *
- * @param {Object} req HTTP request
- * @param {Object} res HTTP response
- */
-const readOne = async (req, res) => {
-  const foundMovie = await Movie.findById(req.params.id).populate(
-    'genres offers.buy.provider offers.rent.provider offers.stream.provider',
-  );
-  return res.json(foundMovie);
-};
-
-const readByGenre = async (req, res) => {
-  const foundMovies = await Movie.paginate(
-    { genres: req.params.id },
-    { page: req.query.page || 1 },
-  );
-  return res.json(foundMovies);
-};
-
-const readByRecommendation = async (req, res) => {
-  // console.log(req.body);
-  const {
-    certifications, genres, release, ratings, foreign,
-  } = req.body;
-
-  // const applicableCerts = recommendations.getCertifications(req.body.certification);
-  const applicableCerts = Object.keys(certifications).filter(
-    certKey => certifications[certKey],
-  );
-  const applicableGenres = Object.keys(genres).filter(genreKey => genres[genreKey]);
-
-  const conditions = {
-    genres: { $in: applicableGenres },
-    certification: { $in: applicableCerts },
-    release_year: { $gte: release.minYear, $lte: release.maxYear },
-    'ratings.rotten_tomatoes.value': {
-      $gte: ratings.rottenTomatoes.minRating,
-      $lte: ratings.rottenTomatoes.maxRating,
-    },
-    'ratings.imdb.value': { $gte: ratings.imdb.minRating, $lte: ratings.imdb.maxRating },
-  };
-  if (!foreign) conditions.original_language = 'en';
-  // TODO: Potentially add provider checking/filtering. Currently no good way to do so
-  // based on how the database is structured, so needs to be handled on front end for now
-  // const { providers } = req.body;
-  // if (providers) {
-  //   const applicableProviders = Object.keys(providers).filter(provKey => providers[provKey]);
-  //   conditions['offers.stream[??].provider._id'] = { $in: applicableProviders };
-  // }
-
-  const foundMovies = await Movie.paginate(conditions, {
-    page: req.query.page || 1,
-    limit: req.body.maxRecs || pageSize,
-  });
-  res.json(foundMovies);
+const readByRecommendation = (req, res) => {
+  const skip = req.query.offset || 0;
+  const limit = req.query.limit || PAGE_SIZE;
+  Movie.find(JSON.parse(req.body), null, { skip, limit })
+    .cursor()
+    .pipe(JSONStream.stringify())
+    .pipe(res.type('json'));
 };
 
 const create = movie => Movie.create(movie);
 
 const insertMany = movies => Movie.insertMany(movies, { ordered: false });
 
+const readBySearchAll = (req, res) => {
+  const skip = req.query.offset || 0;
+  const limit = req.query.limit || PAGE_SIZE;
+  const value = new RegExp(req.query.searchInput, 'gi');
+  Movie.find({
+    $or: [
+      { title: value },
+      { 'credits.cast.name': value },
+      { 'credits.crew.name': value },
+    ],
+  }, null, { skip, limit })
+    .cursor()
+    .pipe(JSONStream.stringify())
+    .pipe(res.type('json'));
+};
+
+const readBySearchTitle = (req, res) => {
+  const skip = req.query.offset || 0;
+  const limit = req.query.limit || PAGE_SIZE;
+  Movie.find({ title: new RegExp(req.query.searchInput, 'gi') }, null, { skip, limit })
+    .cursor()
+    .pipe(JSONStream.stringify())
+    .pipe(res.type('json'));
+};
+
+const readBySearchCast = (req, res) => {
+  const skip = req.query.offset || 0;
+  const limit = req.query.limit || PAGE_SIZE;
+  Movie.find({ 'credits.cast.name': new RegExp(req.query.searchInput, 'gi') }, null, { skip, limit })
+    .cursor()
+    .pipe(JSONStream.stringify())
+    .pipe(res.type('json'));
+};
+
+const readBySearchCrew = (req, res) => {
+  const skip = req.query.offset || 0;
+  const limit = req.query.limit || PAGE_SIZE;
+  Movie.find({ 'credits.crew.name': new RegExp(req.query.searchInput, 'gi') }, null, { skip, limit })
+    .cursor()
+    .pipe(JSONStream.stringify())
+    .pipe(res.type('json'));
+};
+
 module.exports = {
-  model: Movie.modelName,
   readAll,
   readOne,
   readByGenre,

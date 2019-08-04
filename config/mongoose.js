@@ -19,6 +19,8 @@ mongoose.connection.on('error', (err) => {
 // Print Mongoose logs in dev environment
 if (ENV === 'development') mongoose.set('debug', true);
 
+mongoose.set('useCreateIndex', true);
+
 const connect = () => {
   mongoose.connect(MONGO.URI, {
     keepAlive: true,

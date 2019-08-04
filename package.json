@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/yamovie/metadata#readme",
   "dependencies": {
+    "JSONStream": "^1.3.5",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
     "dotenv": "^8.0.0",
