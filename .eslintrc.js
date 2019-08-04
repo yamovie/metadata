@@ -2,24 +2,28 @@ module.exports = {
   env: {
     es6: true,
     node: true,
+    browser: true,
   },
   extends: [
-    'airbnb',
+    'airbnb', 'prettier'
   ],
   globals: {
     Atomics: 'readonly',
     SharedArrayBuffer: 'readonly',
   },
+  parser: 'babel-eslint',
   parserOptions: {
+    ecmaVersion: 2018,
     ecmaFeatures: {
+      impliedStrict: true,
       jsx: true,
     },
-    ecmaVersion: 2018,
-    sourceType: 'module',
+    sourceType: 'script',
   },
   plugins: [
     'react',
   ],
   rules: {
+    'no-console': 0
   },
 };
