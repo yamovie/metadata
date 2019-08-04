@@ -1,5 +1,7 @@
+require('../models');
 const mongoose = require('mongoose');
 const { ENV, MONGO } = require('./vars');
+
 
 // Set mongoose Promise to native Promise
 mongoose.Promise = Promise;
